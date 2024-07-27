@@ -1,0 +1,63 @@
+- hash table
+- CLI
+- trie -> pesquisa de sufixo retorna lista de ids
+- algoritmo de sort (merge?)
+
+---
+
+PESQUISA 1:
+   - chave: sufixo de nome
+   - busca na arvore e retorna lista de ids
+   - busca dados satelites na hash
+   - id do jogador, o nome curto, o nome longo, a lista de posicoes dos jogadores, avaliacao media global e numero de avaliacoes
+   - ORDENADO EM ORDEM DECRESCENTE PELA NOTA GLOBAL (6 casas decimais)
+   - 'player <prefix>'
+
+---
+
+PESQUISA 2:
+   - MAX 20 jogadores retornados
+   - chave da pesquisa é userId -> retorna 20 jogadores, nota dada pelo user, media global e total de avaliações dadas a ele.
+   - ORDENAÇÃO PRIMEIRA: NOTA DO USUARIO
+   - ORDENAÇÃO SECUNDARIA: NOTA GLOBAL 
+   - 'user<userID>'
+   
+---
+   
+PESQUISA 3:
+   - key: posição -> retorna lista de melhores jogadores
+   - jogadores com minimo 1000 avaliações
+   - recebe parametro N de max de jogadores retornados
+   - ORDENADO CRESCENTE DA NOTA GLOBAL DO JOGADOR
+   - 'top<N><position>'
+   
+---
+
+PESQUISA 4:
+   - key: lista de tags -> retorna lista de jogadores associados a intersecção
+   - ORDENADO DECRESCENTE DA NOTA GLOBAL
+   - 'tags<lista de tags>'
+   
+   
+   
+-> função preprocess que inicializa e preenche a hash, inicializa arvores e outras extruturas
+	- retorna tempo de execução
+
+-> NAO DEVE DEMORAR MAIS DE 3 MINUTOS
+
+-> entra em modo console de pesquisas
+
+==============================================================
+
+TASKS:
+- Hash jogador [GUI]
+- Hash notas user [GUI]
+- Hash posição (top n jogadores) [-]
+- Hash tags (1 hash pra cada tag?) [-]
+- Mergesort [EU]
+- Implementação da trie (estruturas e pesquisas) [EU]
+
+- Juntar criação de estruturas em uma função integrada de preprocess
+- Juntar tudo e fazer a CLI
+
+
