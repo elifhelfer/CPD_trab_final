@@ -16,13 +16,11 @@ class trie_tree:
                 if child.letter == word[i]:
                     aux_node = child
                     found = True
-                    if i == len(word)-1:
-                        child.is_end = True         #trocar para ID sofifa
             if found == False:
                 new_node = trie_node(word[i])
                 aux_node.children.append(new_node)
                 aux_node = new_node
-                if i == len(word)-1:
+            if i == len(word)-1:
                         aux_node.is_end = True         #trocar para ID sofifa
                 
     def collect_words(self, node: trie_node, prefix: str, words: list):
@@ -57,4 +55,4 @@ if __name__ == "__main__":
     tree.insert('samba')
     tree.insert('sans')
 
-    print(tree.search('tes'))
+    print(tree.search('d'))
