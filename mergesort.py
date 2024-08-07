@@ -31,7 +31,8 @@ def mergesort(array:list, index:int) -> list:
         return merge(left_sorted,right_sorted, index)
     return array
 
-arr = [['a', 3, 4328], ['b', 4, 4542], ['c', 9, 4353], ['d', 1, 1234], ['e', 9, 5371], ['f', 2, 9073]]
-
-print(mergesort(arr, 1))
+if __name__ == '__main__':
+    #example
+    arr = [['a', 3, 4328], ['b', 4, 4542], ['c', 9, 4353], ['d', 1, 1234], ['e', 9, 5371], ['f', 2, 9073]]
+    print(mergesort(arr, 1))
 
