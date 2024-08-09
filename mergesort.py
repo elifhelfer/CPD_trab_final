@@ -32,7 +32,21 @@ def mergesort(array:list, index:int) -> list:
     return array
 
 if __name__ == '__main__':
-    #example
-    arr = [['a', 3, 4328], ['b', 4, 4542], ['c', 9, 4353], ['d', 1, 1234], ['e', 9, 5371], ['f', 2, 9073]]
-    print(mergesort(arr, 1))
+    # example
+    arr = [
+    [12, 34, 56],
+    [78, 90, 3],
+    [34, 56, 78],
+    [90, 12, 34],
+    [56, 78, 90],
+    [12, 34, 56],
+    [78, 90, 12],
+    [34, 56, 78],
+    [90, 12, 34],
+    [56, 78, 90]
+]
+
+    print(mergesort(arr, 2)[::-1])
+    print(mergesort(arr, 1)[::-1])
+    print(mergesort(arr, 0)[::-1])
 
