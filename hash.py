@@ -1,23 +1,12 @@
-<<<<<<< HEAD
-import pandas as pd
-
-class FifaHash:
-    def __init__(self, hash_size):
-        self.hash_size = hash_size
-        self.player_count = 0
-        self.buckets = [[] for _ in range(self.capacity)]
-=======
 class FifaHash:
     def __init__(self, hash_size):
         self.hash_size = hash_size
         self.buckets = [[] for _ in range(self.hash_size)]
->>>>>>> hash-jogador
 
     def hash_function(self, key):
         """Basic hash function: key % size_of_hash"""
         return key % self.hash_size
-    
-<<<<<<< HEAD
+
     def insert(self, fifa_id, player_info):
         """Insert appends the new info to the end of the list in the bucket"""
         index = self.hash_function(fifa_id)
@@ -33,8 +22,6 @@ class FifaHash:
                 return player
         return None
 
-    
-=======
     def insert(self, key, info):
         """Appends the new info to the end of the list in the bucket"""
         index = self.hash_function(key)
@@ -172,4 +159,3 @@ if __name__ == "__main__":
     print('players search result with 1 key',player_hash.search(254234))
     print('players search result with many keys',player_hash.search(210429,210646,211189,211438,211619))
 
->>>>>>> hash-jogador
