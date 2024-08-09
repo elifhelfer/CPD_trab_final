@@ -73,9 +73,9 @@ class PlayerHash(FifaHash):
         
         for element in self.buckets[index]:
             if int(element[0]) == key:
-                # adds 
-                element[-2] += score
-                element[-3] += 1
+                element[-1] += score
+                #review count
+                element[-2] += 1
                 return 
         print("Player reviewd not found")
         return

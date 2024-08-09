@@ -14,7 +14,7 @@ def initialize_data_structures():
         # skips header
         next(reader)
         for row in reader:
-            # last two fields: [amount of reviews, score of review]
+            # last two fields: [amount of reviews, score]
             player_hash.insert(int(row[0]), row + [0, 0])    
             # (name, player_id)
             trie_names.insert(row[2], row[0])
@@ -32,7 +32,7 @@ def initialize_data_structures():
             user_hash.insert(int(row[0]), tuple(row))
     
     #loop to create the trie tree and fill it with players tags
-    trie_tags = trie.trie_tags()
+    trie_tags = trie.trie_tree()
     with open('tags.csv', newline='') as tags:
         reader = csv.reader(tags)
         # skips header
@@ -44,7 +44,7 @@ def initialize_data_structures():
     end_time = time.time()
     result_time = end_time - start_time
 
-    return player_hash, user_hash, trie_tags, trie_names ,result_time
+    return player_hash, user_hash, trie_tags, trie_names, result_time
 
 if __name__ == "__main__":
     player_hash, user_hash, trie_tags, trie_names, result_time = initialize_data_structures()
@@ -52,9 +52,42 @@ if __name__ == "__main__":
 
     # enquanto não finlandês    
     options = """
-    1. Buscar jogador por nome - insira: player <prefixo>
-    2. Buscar avaliações de um usuário - insira: user <user_id>
-    3. Buscar top N jogadores para posição - insira: top <N> <position>
-    4. Buscar jogadores por lista de tags - tags <tag1>,<tag2>,...,<tagN>
-    5. Sair - insira: sair
-    """
+1. Buscar jogador por nome - insira: player <prefixo>
+2. Buscar avaliações feitas por um usuário - insira: user <user_id>
+3. Buscar top N jogadores para posição - insira: top <N> <position>
+4. Buscar jogadores por lista de tags - tags <tag1>,<tag2>,...,<tagN>
+5. Sair - insira: sair
+opção desejada: """
+
+    while True:
+        user_input = input(options).strip()
+
+        if user_input.startswith("player"):
+            prefix = user_input.split(" ", 1)[1]
+            # retorna lista com ids
+            search_result = trie_names.search(prefix)
+            # retorna lista com informações dos jogadores
+            search_result = [player_hash.search(int(player_id)) for player_id in search_result]
+            # calcula media do score
+            for player in search_result:
+                player[-1] = player[-1] / player[-2]
+            # sort de acordo com score medio e torna decrescente
+            search_result = mergesort.mergesort(search_result, -1)[::-1]
+            for player in search_result:
+                # id, short_name, long_name, position, rating, count
+                print(player[0], player[1], player[2], player[3], f'{player[-1]:.6}', player[-2])
+
+        elif user_input.startswith("user"):
+            user_id = user_input.split(" ", 1)[1]
+            # Adicione aqui o código para buscar avaliações de um usuário usando o user_id
+        
+        elif user_input.startswith("top"):
+            _, N, position = user_input.split(" ")
+            # Adicione aqui o código para buscar top N jogadores para a posição
+        
+        elif user_input.startswith("tags"):
+            tags = user_input.split(" ", 1)[1].split(",")
+            # Adicione aqui o código para buscar jogadores por lista de tags        
+        elif user_input == "sair":
+            print("saindo...")
+            break
