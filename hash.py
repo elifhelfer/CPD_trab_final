@@ -128,7 +128,7 @@ if __name__ == "__main__":
             # (player_id, score)
             player_hash.insert_review(int(row[1]), float(row[2]))
             # (user_id, info)
-            user_hash.insert(int(row[0]), (row[0], row[1], row[2]))
+            user_hash.insert(int(row[0]), tuple(row))
     
     end_time = time.time()
     # Calcular e imprimir o tempo total de execução
