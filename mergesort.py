@@ -31,6 +31,9 @@ def mergesort(array:list, index:int) -> list:
         return merge(left_sorted,right_sorted, index)
     return array
 
+def dec_mergesort(array:list, index:int) -> list:
+    return (mergesort(array,index)[::-1])
+
 if __name__ == '__main__':
     # example
     arr = [
@@ -46,7 +49,7 @@ if __name__ == '__main__':
     [56, 78, 90]
 ]
 
-    print(mergesort(arr, 2)[::-1])
-    print(mergesort(arr, 1)[::-1])
-    print(mergesort(arr, 0)[::-1])
+    print(dec_mergesort(arr, 2))
+    print(dec_mergesort(arr, 1))
+    print(dec_mergesort(arr, 0))
 
