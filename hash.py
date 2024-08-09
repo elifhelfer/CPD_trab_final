@@ -73,8 +73,9 @@ class PlayerHash(FifaHash):
         
         for element in self.buckets[index]:
             if int(element[0]) == key:
-                element[-1] += score
-                element[-2] += 1
+                # adds 
+                element[-2] += score
+                element[-3] += 1
                 return 
         print("Player reviewd not found")
         return
@@ -130,8 +131,8 @@ if __name__ == "__main__":
         # skips header
         next(reader)
         for row in reader:
-            # last two fields: [amount of reviews, score of review]
-            player_hash.insert(int(row[0]), row + [0, 0])    
+            # last two fields: [amount of reviews, sum of score, global score]
+            player_hash.insert(int(row[0]), row + [0, 0, 0])    
     #loop to create the user hash and insert reviews into players
     user_hash = UserHash(115001)
     with open('/home/guifernandes0521/final_cpd/CPD_trab_final/rating.csv', newline='') as user_reviews:
