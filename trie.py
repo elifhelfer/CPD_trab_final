@@ -27,7 +27,7 @@ class trie_tree:
                 
     def collect_words(self, node: trie_node, prefix: str, words: list):
         if node.is_end:
-            words.append((prefix, node.is_end))
+            words.extend(node.is_end)
         for child in node.children:
             self.collect_words(child, prefix+child.letter, words)
         return words
@@ -50,27 +50,17 @@ class trie_tree:
         results = self.collect_words(aux_node, prefix, words)
         return results
 
-class trie_tags(trie_tree):
-    def collect_words(self, node: trie_node, prefix: str, words: list):
-        if node.is_end:
-            words.append(node.is_end)
-        for child in node.children:
-            self.collect_words(child, prefix+child.letter, words)
-        return words
-
-
 if __name__ == "__main__":
     
-    csv_file = './arquivos-parte1/players.csv'
     tree = trie_tree()
 
-    with open(csv_file, mode='r', newline='') as file:
-        csv_reader = csv.reader(file)
-        
-        for row in csv_reader:
-            tree.insert(row[2], row[0])
-    
-    print(tree.search('PAUL'))
+    #with open('players.csv', mode='r', newline='') as file:
+    #    csv_reader = csv.reader(file)
+    #    next(csv_reader)
+    #    for row in csv_reader:
+    #        tree.insert(row[2], row[0])
+    #
+    #print(tree.search('PAUL'))
 
     csv_file = './arquivos-parte1/tags.csv'
     tree = trie_tags()
