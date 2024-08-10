@@ -49,25 +49,44 @@ class trie_tree:
             return None
         results = self.collect_words(aux_node, prefix, words)
         return results
+    
+    def search_non_recursive(self, key: str):
+        aux_node = self.root
+        key = key.lower()
+        prefix = ''
+        for letter in key:
+            found = False
+            for child in aux_node.children:
+                if child.letter.lower() == letter:
+                    prefix += child.letter
+                    aux_node = child
+                    found = True
+                    break
+        if not found:
+            return None
+        if aux_node.is_end:
+            return aux_node.is_end
+        else:
+            return None
 
 if __name__ == "__main__":
     
     tree = trie_tree()
 
-    #with open('players.csv', mode='r', newline='') as file:
-    #    csv_reader = csv.reader(file)
-    #    next(csv_reader)
-    #    for row in csv_reader:
-    #        tree.insert(row[2], row[0])
-    #
-    #print(tree.search('PAUL'))
+    with open('players.csv', mode='r', newline='') as file:
+       csv_reader = csv.reader(file)
+       next(csv_reader)
+       for row in csv_reader:
+           tree.insert(row[2], row[0])
+    
+    print(tree.search('lucas'))
 
-    csv_file = './arquivos-parte1/tags.csv'
-    tree = trie_tags()
-    with open(csv_file, mode='r', newline='') as file:
-        csv_reader = csv.reader(file)
+    # csv_file = './arquivos-parte1/tags.csv'
+    # tree = trie_tree()
+    # with open(csv_file, mode='r', newline='') as file:
+    #     csv_reader = csv.reader(file)
         
-        for row in csv_reader:
-            tree.insert(row[2], row[1])
+    #     for row in csv_reader:
+    #         tree.insert(row[2], row[1])
 
-    print(tree.search('BRAZIL'))
+    # print(tree.search('BRAZIL'))

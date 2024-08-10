@@ -2,7 +2,8 @@ import trie
 import hash
 import time
 import csv
-import mergesort
+from mergesort import dec_mergesort
+import re
 
 def initialize_data_structures():
     start_time = time.time()
@@ -21,7 +22,7 @@ def initialize_data_structures():
 
     #loop to create the user hash and name tree and insert reviews into players
     user_hash = hash.UserHash(115001)
-    with open('rating.csv', newline='') as user_reviews:
+    with open('minirating.csv', newline='') as user_reviews:
         reader = csv.reader(user_reviews)
         # skips header
         next(reader)
@@ -55,12 +56,13 @@ if __name__ == "__main__":
 1. Buscar jogador por nome - insira: player <prefixo>
 2. Buscar avaliações feitas por um usuário - insira: user <user_id>
 3. Buscar top N jogadores para posição - insira: top <N> <position>
-4. Buscar jogadores por lista de tags - tags <tag1>,<tag2>,...,<tagN>
+4. Buscar jogadores por lista de tags - tags '<tag1>''<tag2>'...'<tagN>'
 5. Sair - insira: sair
-opção desejada: """
+
+Opção desejada: """
 
     while True:
-        user_input = input(options).strip()
+        user_input = input(options).strip().lower()
 
         if user_input.startswith("player"):
             prefix = user_input.split(" ", 1)[1]
@@ -70,24 +72,79 @@ opção desejada: """
             search_result = [player_hash.search(int(player_id)) for player_id in search_result]
             # calcula media do score
             for player in search_result:
-                player[-1] = player[-1] / player[-2]
+                if player[-2] != 0:
+                    player[-1] = player[-1] / player[-2]
+                else:
+                    player[-1] = 0.0
             # sort de acordo com score medio e torna decrescente
-            search_result = mergesort.mergesort(search_result, -1)[::-1]
+            search_result = dec_mergesort(search_result, -1)
             for player in search_result:
                 # id, short_name, long_name, position, rating, count
                 print(player[0], player[1], player[2], player[3], f'{player[-1]:.6}', player[-2])
 
         elif user_input.startswith("user"):
             user_id = user_input.split(" ", 1)[1]
-            # Adicione aqui o código para buscar avaliações de um usuário usando o user_id
-        
+            #retorna o id informado pelo usuario
+            user_reviews = user_hash.get_reviews(int(user_id))
+            #retorna lista com player ids e reviews pra cada um
+            player_info = []
+            for player_id, review in user_reviews:  #procura dados do jogador na hash a partir do id, pega a review associada ao jogador e da append no fim da lista retornada pela hash
+                player_data = player_hash.search(int(player_id))
+                player_data.append(review)
+                player_info.append(player_data)
+
+            player_info = dec_mergesort(player_info, -1)    #ordena primeiro pela review do usuario e depois pela media global, de forma estavel
+            player_info = dec_mergesort(player_info, -2)
+
+            if len(player_info) > 20:   #se forem mais que 20 jogadores, imprime apenas os primeiros 20
+                player_info = player_info[:20]
+
+            for player in player_info:
+                print(player[0], player[1], player[2], player[3], f'{player[-2]:.6}', player[-3], player[-1])
+
+    
         elif user_input.startswith("top"):
             _, N, position = user_input.split(" ")
             # Adicione aqui o código para buscar top N jogadores para a posição
+
         
         elif user_input.startswith("tags"):
-            tags = user_input.split(" ", 1)[1].split(",")
-            # Adicione aqui o código para buscar jogadores por lista de tags        
+            player_info = []
+            aux_set = None
+            tags = re.findall("'(.*?)'", user_input[1:]) #isso aqui pega todas as strings entre ''. eu tinha feito de um outro jeito, mas ele nao funcionava se nao tivesse um espaco entre cada tag
+                                                         #os ' marcam o que deve estar no inicio e no fim da string, * indica que eh pra pegar
+                                                         #todos os caracteres e ? impede que ele junte todas as tags em uma string só, parando de coletar a cada fim de '
+            if not tags:
+                print('Nenhuma tag fornecida.')
+                break
+
+            for tag in tags:
+                players_list = trie_tags.search_non_recursive(tag) #procura jogadores com a tag
+                if not players_list:
+                    print(f'Sem resultados para jogadores com a tag {tag}.')
+                    break
+
+                player_set = set()
+                for player in players_list:
+                    player_set.add(int(player)) #vai adicionando a um novo set por tag
+
+                if aux_set is None:
+                    aux_set = player_set #se aux_set ainda nao tem nada, inicializa ele
+                else:
+                    aux_set &= player_set #pra todas as outras iteracoes, aux_set guarda a interseccao entre os jogadores com a tag atual e a anterior
+
+            if not aux_set:
+                print('Sem jogadores com essa combinacao de tags.')
+                continue
+
+            players_list = [player_hash.search(int(player)) for player in aux_set]
+            #busca cada jogador na hash
+            players_list = dec_mergesort(players_list,-1)
+            #ordena por nota global media
+            for player in players_list:
+                # id, short_name, long_name, position, rating, count
+                print(player[0], player[1], player[2], player[3], f'{player[-1]:.6}', player[-2])   
+
         elif user_input == "sair":
-            print("saindo...")
+            print("Saindo...")
             break
