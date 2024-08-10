@@ -4,7 +4,8 @@ import time
 import csv
 from mergesort import dec_mergesort
 import re
-import rich
+from rich.table import Table
+from rich.console import Console
 
 def initialize_data_structures():
     start_time = time.time()
@@ -49,6 +50,22 @@ def initialize_data_structures():
 
     return player_hash, user_hash, trie_tags, trie_names, result_time
 
+def make_table(info_arr:list, title:str):
+
+    table = Table(title=title)
+    table.add_column('Id SOFIFA', justify='center', style='blue')
+    table.add_column('Nome curto')
+    table.add_column('Nome longo')
+    table.add_column('Posições')
+    table.add_column('Média global')
+    table.add_column('Reviews')
+    
+    for info in info_arr:
+        # id, short_name, long_name, position, rating, count
+        table.add_row(str(info[0]), str(info[1]), str(info[2]), str(info[3]), f'{info[-1]:.6}', str(info[-2]))
+    
+    return table
+
 if __name__ == "__main__":
     player_hash, user_hash, trie_tags, trie_names, result_time = initialize_data_structures()
     print(f'Tempo de inicialização das estruturas de dados: {result_time:.2f} segundos')
@@ -74,9 +91,10 @@ Opção desejada: """
             search_result = [player_hash.search(int(player_id)) for player_id in search_result]
             # sort de acordo com score medio e torna decrescente
             search_result = dec_mergesort(search_result, -1)
-            for player in search_result:
-                # id, short_name, long_name, position, rating, count
-                print(player[0], player[1], player[2], player[3], f'{player[-1]:.6}', player[-2])
+
+            table = make_table(search_result, f'Resultados da busca por {prefix}')
+            console = Console()
+            console.print(table)
 
         elif user_input.startswith("user"):
             user_id = user_input.split(" ", 1)[1]
