@@ -4,6 +4,7 @@ import time
 import csv
 from mergesort import dec_mergesort
 import re
+import rich
 
 def initialize_data_structures():
     start_time = time.time()
@@ -31,6 +32,7 @@ def initialize_data_structures():
             player_hash.insert_review(int(row[1]), float(row[2]))
             # (user_id, info)
             user_hash.insert(int(row[0]), tuple(row))
+        player_hash.calc_avg_score()
     
     #loop to create the trie tree and fill it with players tags
     trie_tags = trie.trie_tree()
@@ -70,12 +72,6 @@ Opção desejada: """
             search_result = trie_names.search(prefix)
             # retorna lista com informações dos jogadores
             search_result = [player_hash.search(int(player_id)) for player_id in search_result]
-            # calcula media do score
-            for player in search_result:
-                if player[-2] != 0:
-                    player[-1] = player[-1] / player[-2]
-                else:
-                    player[-1] = 0.0
             # sort de acordo com score medio e torna decrescente
             search_result = dec_mergesort(search_result, -1)
             for player in search_result:

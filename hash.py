@@ -85,6 +85,8 @@ class PlayerHash(FifaHash):
             for element in self.buckets[i]:
                 if element[-2] != 0:
                     element[-1] = element[-1]/element[-2]
+                else:
+                    element[-1] = 0.0
 
     def search(self, key=None, *keys):
         """If a list of keys is passed, returns a list of players.
