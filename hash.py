@@ -80,6 +80,12 @@ class PlayerHash(FifaHash):
         print("Player reviewd not found")
         return
     
+    def calc_avg_score(self):
+        for i in range(self.hash_size):
+            for element in self.buckets[i]:
+                if element[-2] != 0:
+                    element[-1] = element[-1]/element[-2]
+
     def search(self, key=None, *keys):
         """If a list of keys is passed, returns a list of players.
         If a list of keys is passed, returns a list of all elements with the same key"""
