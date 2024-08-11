@@ -7,21 +7,6 @@ class FifaHash:
         """Basic hash function: key % size_of_hash"""
         return key % self.hash_size
 
-    def insert(self, fifa_id, player_info):
-        """Insert appends the new info to the end of the list in the bucket"""
-        index = self.hash_function(fifa_id)
-        self.buckets[index].append(player_info)
-        self.player_count += 1
-
-    def search(self, fifa_id):
-        """Searches the required id and returns player's, otherwise returns None"""
-        index = self.hash_function(fifa_id)
-        
-        for player in self.buckets[index]:
-            if player[0] == fifa_id:
-                return player
-        return None
-
     def insert(self, key, info):
         """Appends the new info to the end of the list in the bucket"""
         index = self.hash_function(key)
@@ -67,7 +52,7 @@ class FifaHash:
 class PlayerHash(FifaHash):
     def __init__(self, hash_size):
         super().__init__(hash_size)
-    
+
     def insert_review(self, key, score):
         index = self.hash_function(key)
         
@@ -88,29 +73,15 @@ class PlayerHash(FifaHash):
                 else:
                     element[-1] = 0.0
 
-    def search(self, key=None, *keys):
-        """If a list of keys is passed, returns a list of players.
-        If a list of keys is passed, returns a list of all elements with the same key"""
-        
-        if not key and not keys:
-            raise ValueError("Key or keys must be passed")
-        # if a list of keys is passed, returns a list of players
-        if keys:
-            players = []
-            for k in keys:
-                index = self.hash_function(k)
-                for element in self.buckets[index]:
-                    if int(element[0]) == k:
-                        players.append(element)
-            return players
-        # if a single key is passed, returns a single player   
-        else:
-            index = self.hash_function(key)
-            for element in self.buckets[index]:
-                if int(element[0]) == key:
-                    return element
-            print("Player not found")
-            return None
+    def position_over_1000(self, position:str):
+        """Returns players with more than a thousand reviews"""
+        over_1000 = []
+        for i in range(self.hash_size):
+            for element in self.buckets[i]:
+                if element[-2] >= 1000:
+                    if position.upper() in element[3]:
+                        over_1000.append(element)
+                
 class UserHash(FifaHash):
     def __init__(self, hash_size):
         super().__init__(hash_size)

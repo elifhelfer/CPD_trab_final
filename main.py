@@ -24,7 +24,7 @@ def initialize_data_structures():
 
     #loop to create the user hash and name tree and insert reviews into players
     user_hash = hash.UserHash(115001)
-    with open('minirating.csv', newline='') as user_reviews:
+    with open('rating.csv', newline='') as user_reviews:
         reader = csv.reader(user_reviews)
         # skips header
         next(reader)
@@ -50,23 +50,37 @@ def initialize_data_structures():
 
     return player_hash, user_hash, trie_tags, trie_names, result_time
 
-def make_table(info_arr:list, title:str):
+def make_table(info_arr:list, title:str, user_input:str):
 
     table = Table(title=title)
     table.add_column('Id SOFIFA', justify='center', style='blue')
     table.add_column('Nome curto')
     table.add_column('Nome longo')
-    table.add_column('Posições')
+    if user_input.startswith("player") or user_input.startswith("tags") or user_input.startswith("top"):
+        table.add_column('Posições')
+    if user_input.startswith("tags") or user_input.startswith("top"):
+        table.add_column('Nacionalidade')
+        table.add_column('Nome do clube')
+        table.add_column('Nome da liga')
     table.add_column('Média global')
-    table.add_column('Reviews')
+    table.add_column('Nº de Avaliações')
+    if user_input.startswith("user"):
+        table.add_column('Avaliação do usuário')
     
     for info in info_arr:
         # id, short_name, long_name, position, rating, count
-        table.add_row(str(info[0]), str(info[1]), str(info[2]), str(info[3]), f'{info[-1]:.6}', str(info[-2]))
+        if user_input.startswith("player"):
+            table.add_row(str(info[0]), str(info[1]), str(info[2]), str(info[3]), f'{info[-1]:.6}', str(info[-2]))
+        elif user_input.startswith("user"):
+        # id, short_name, long_name, global rating, count, user review
+            table.add_row(str(info[0]), str(info[1]), str(info[2]), f'{info[-2]:.6}', str(info[-3]), str(info[-1]))
+        else:
+            table.add_row(str(info[0]), str(info[1]), str(info[2]), str(info[3]), str(info[4]), str(info[5]), str(info[6]), f'{info[-1]:.6}', str(info[-2]))
+            pass
     
     return table
 
-if __name__ == "__main__":
+def main():
     player_hash, user_hash, trie_tags, trie_names, result_time = initialize_data_structures()
     print(f'Tempo de inicialização das estruturas de dados: {result_time:.2f} segundos')
 
@@ -92,15 +106,16 @@ Opção desejada: """
             # sort de acordo com score medio e torna decrescente
             search_result = dec_mergesort(search_result, -1)
 
-            table = make_table(search_result, f'Resultados da busca por {prefix}')
+            table = make_table(search_result, f'Resultados da busca por {prefix}', user_input)            
+            
             console = Console()
             console.print(table)
 
         elif user_input.startswith("user"):
-            user_id = user_input.split(" ", 1)[1]
             #retorna o id informado pelo usuario
-            user_reviews = user_hash.get_reviews(int(user_id))
+            user_id = user_input.split(" ", 1)[1]
             #retorna lista com player ids e reviews pra cada um
+            user_reviews = user_hash.get_reviews(int(user_id))
             player_info = []
             for player_id, review in user_reviews:  #procura dados do jogador na hash a partir do id, pega a review associada ao jogador e da append no fim da lista retornada pela hash
                 player_data = player_hash.search(int(player_id))
@@ -113,14 +128,28 @@ Opção desejada: """
             if len(player_info) > 20:   #se forem mais que 20 jogadores, imprime apenas os primeiros 20
                 player_info = player_info[:20]
 
-            for player in player_info:
-                print(player[0], player[1], player[2], player[3], f'{player[-2]:.6}', player[-3], player[-1])
-
+            ## prints table
+            table = make_table(player_info, f'Jogadores avaliados por usuário {user_id}', user_input)            
+            
+            console = Console()
+            console.print(table)
     
         elif user_input.startswith("top"):
-            _, N, position = user_input.split(" ")
-            # Adicione aqui o código para buscar top N jogadores para a posição
+            top_string, position = user_input.split(" ")
+            # slices topN to get N
+            N_players = int(top_string[3:])
+            # retorna lista com informações dos top jogadores para posição
+            players_list = player_hash.position_over_1000(position)
 
+            if not players_list:
+                print(f'Sem resultados para a posição {position}.')
+                continue
+            # ordena por media global e pega os N primeiros
+            players_list = dec_mergesort(players_list, -1)[0:N_players]
+            table = make_table(players_list, f'Top {N_players} jogadores para a posição {position}', user_input)
+
+            console = Console()
+            console.print(table)
         
         elif user_input.startswith("tags"):
             player_info = []
@@ -148,17 +177,21 @@ Opção desejada: """
                     aux_set &= player_set #pra todas as outras iteracoes, aux_set guarda a interseccao entre os jogadores com a tag atual e a anterior
 
             if not aux_set:
-                print('Sem jogadores com essa combinacao de tags.')
+                print('Sem jogadores com essa combinação de tags.')
                 continue
 
             players_list = [player_hash.search(int(player)) for player in aux_set]
             #busca cada jogador na hash
             players_list = dec_mergesort(players_list,-1)
             #ordena por nota global media
-            for player in players_list:
-                # id, short_name, long_name, position, rating, count
-                print(player[0], player[1], player[2], player[3], f'{player[-1]:.6}', player[-2])   
+            table = make_table(players_list, f'Resultados da busca pelas tags {tags}', user_input)            
+            
+            console = Console()
+            console.print(table)
 
         elif user_input == "sair":
             print("Saindo...")
             break
+
+# call main function
+main()
