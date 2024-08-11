@@ -87,10 +87,10 @@ def make_table(info_arr:list, title:str, user_input:str):
 
 def main():
     player_hash, user_hash, trie_tags, trie_names, result_time = initialize_data_structures()
-    print(f'Tempo de inicialização das estruturas de dados: {result_time:.2f} segundos')
-
     console = Console()
     os.system('clear')
+    print(f'Tempo de inicialização das estruturas de dados: {result_time:.2f} segundos')
+
 
     # enquanto não finlandês    
     options = """Opções:
