@@ -86,11 +86,10 @@ def make_table(info_arr:list, title:str, user_input:str):
     return table
 
 def main():
-    player_hash, user_hash, trie_tags, trie_names, result_time = initialize_data_structures()
     console = Console()
     os.system('clear')
+    player_hash, user_hash, trie_tags, trie_names, result_time = initialize_data_structures()
     print(f'Tempo de inicialização das estruturas de dados: {result_time:.2f} segundos')
-
 
     # enquanto não finlandês    
     options = """Opções:
@@ -102,7 +101,7 @@ def main():
 
 Opção desejada: """
 
-    title = r"""     
+    title = r"""
    _______________     _______ _____   __  ______  ________  _  ______   _________  _____  _______ 
   / __/  _/ __/ _ |   / ___/ // / _ | /  |/  / _ \/  _/ __ \/ |/ / __/  / __/  _/ |/ / _ \/ __/ _ \
  / _/_/ // _// __ |  / /__/ _  / __ |/ /|_/ / ___// // /_/ /    /\ \   / _/_/ //    / // / _// , _/
