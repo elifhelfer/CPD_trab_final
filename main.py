@@ -6,6 +6,7 @@ from mergesort import dec_mergesort
 import re
 from rich.table import Table
 from rich.console import Console
+import os
 
 def initialize_data_structures():
     start_time = time.time()
@@ -24,7 +25,7 @@ def initialize_data_structures():
 
     #loop to create the user hash and name tree and insert reviews into players
     user_hash = hash.UserHash(115001)
-    with open('rating.csv', newline='') as user_reviews:
+    with open('minirating.csv', newline='') as user_reviews:
         reader = csv.reader(user_reviews)
         # skips header
         next(reader)
@@ -84,8 +85,11 @@ def main():
     player_hash, user_hash, trie_tags, trie_names, result_time = initialize_data_structures()
     print(f'Tempo de inicialização das estruturas de dados: {result_time:.2f} segundos')
 
+    console = Console()
+    console.clear()
+
     # enquanto não finlandês    
-    options = """
+    options = """Opções:
 1. Buscar jogador por nome - insira: player <prefixo>
 2. Buscar avaliações feitas por um usuário - insira: user <user_id>
 3. Buscar top N jogadores para posição - insira: top <N> <position>
@@ -94,13 +98,28 @@ def main():
 
 Opção desejada: """
 
+    title = r"""     
+    ___________________       ________  _____    __  _______  ________  _   _______    ___________   ______  __________ 
+   / ____/  _/ ____/   |     / ____/ / / /   |  /  |/  / __ \/  _/ __ \/ | / / ___/   / ____/  _/ | / / __ \/ ____/ __ \
+  / /_   / // /_  / /| |    / /   / /_/ / /| | / /|_/ / /_/ // // / / /  |/ /\__ \   / /_   / //  |/ / / / / __/ / /_/ /
+ / __/ _/ // __/ / ___ |   / /___/ __  / ___ |/ /  / / ____// // /_/ / /|  /___/ /  / __/ _/ // /|  / /_/ / /___/ _, _/ 
+/_/   /___/_/   /_/  |_|   \____/_/ /_/_/  |_/_/  /_/_/   /___/\____/_/ |_//____/  /_/   /___/_/ |_/_____/_____/_/ |_|                                                                         
+                                                                                                                                        
+    """
+    print(title)
+
     while True:
         user_input = input(options).strip().lower()
+
+        console.clear()
 
         if user_input.startswith("player"):
             prefix = user_input.split(" ", 1)[1]
             # retorna lista com ids
             search_result = trie_names.search(prefix)
+            if not search_result:
+                print(f'Sem resultados para a pesqusisa por {prefix}.')
+                continue
             # retorna lista com informações dos jogadores
             search_result = [player_hash.search(int(player_id)) for player_id in search_result]
             # sort de acordo com score medio e torna decrescente
@@ -108,14 +127,19 @@ Opção desejada: """
 
             table = make_table(search_result, f'Resultados da busca por {prefix}', user_input)            
             
-            console = Console()
             console.print(table)
+            input('Pressione enter para continuar...')
+            console.clear()
 
         elif user_input.startswith("user"):
             #retorna o id informado pelo usuario
             user_id = user_input.split(" ", 1)[1]
             #retorna lista com player ids e reviews pra cada um
             user_reviews = user_hash.get_reviews(int(user_id))
+            if not user_reviews:
+                console.clear()
+                print(f'Sem resultados para o usuário {user_id}')
+                continue
             player_info = []
             for player_id, review in user_reviews:  #procura dados do jogador na hash a partir do id, pega a review associada ao jogador e da append no fim da lista retornada pela hash
                 player_data = player_hash.search(int(player_id))
@@ -130,26 +154,36 @@ Opção desejada: """
 
             ## prints table
             table = make_table(player_info, f'Jogadores avaliados por usuário {user_id}', user_input)            
-            
-            console = Console()
+
             console.print(table)
+            input('Pressione enter para continuar...')
+            console.clear()
     
         elif user_input.startswith("top"):
             top_string, position = user_input.split(" ")
             # slices topN to get N
             N_players = int(top_string[3:])
+
+            if not N_players:
+                console.clear()
+                print('Insira um numero.')
+                continue
             # retorna lista com informações dos top jogadores para posição
             players_list = player_hash.position_over_1000(position)
 
             if not players_list:
+                console.clear()
                 print(f'Sem resultados para a posição {position}.')
                 continue
             # ordena por media global e pega os N primeiros
-            players_list = dec_mergesort(players_list, -1)[0:N_players]
+            players_list = dec_mergesort(players_list, -1)
+            if players_list > N_players:
+                players_list = players_list[:N_players]
             table = make_table(players_list, f'Top {N_players} jogadores para a posição {position}', user_input)
 
-            console = Console()
             console.print(table)
+            input('Pressione enter para continuar...')
+            console.clear()
         
         elif user_input.startswith("tags"):
             player_info = []
@@ -186,12 +220,16 @@ Opção desejada: """
             #ordena por nota global media
             table = make_table(players_list, f'Resultados da busca pelas tags {tags}', user_input)            
             
-            console = Console()
             console.print(table)
+            input('Pressione enter para continuar...')
+            console.clear()
 
         elif user_input == "sair":
             print("Saindo...")
+            console.clear()
             break
+        else:
+            print('Opção inválida.')
 
 # call main function
 main()
