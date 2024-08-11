@@ -54,19 +54,23 @@ def initialize_data_structures():
 def make_table(info_arr:list, title:str, user_input:str):
 
     table = Table(title=title)
-    table.add_column('Id SOFIFA', justify='center', style='blue')
-    table.add_column('Nome curto')
-    table.add_column('Nome longo')
+    table.add_column('Id SOFIFA', justify='center', style='bold bright_blue')
+    table.add_column('Nome curto', justify ='center', style = 'bold orange1')
+    table.add_column('Nome longo', justify ='center', style = 'bold green')
+
     if user_input.startswith("player") or user_input.startswith("tags") or user_input.startswith("top"):
-        table.add_column('Posições')
+        table.add_column('Posições', justify ='center', style = 'bold bright_yellow')
+
     if user_input.startswith("tags") or user_input.startswith("top"):
-        table.add_column('Nacionalidade')
-        table.add_column('Nome do clube')
-        table.add_column('Nome da liga')
-    table.add_column('Média global')
-    table.add_column('Nº de Avaliações')
+        table.add_column('Nacionalidade', justify ='center', style = 'bold bright_red')
+        table.add_column('Nome do clube', justify ='center', style = 'bold bright_cyan')
+        table.add_column('Nome da liga', justify ='center', style = 'bold dark_red')
+
+    table.add_column('Média global', justify ='center', style = 'bold hot_pink')
+    table.add_column('Nº de Avaliações', justify ='center', style = 'bold bright_red')
+
     if user_input.startswith("user"):
-        table.add_column('Avaliação do usuário')
+        table.add_column('Avaliação do usuário', justify ='center', style = 'bold bright_cyan')
     
     for info in info_arr:
         # id, short_name, long_name, position, rating, count
@@ -86,7 +90,7 @@ def main():
     print(f'Tempo de inicialização das estruturas de dados: {result_time:.2f} segundos')
 
     console = Console()
-    console.clear()
+    os.system('clear')
 
     # enquanto não finlandês    
     options = """Opções:
@@ -99,37 +103,35 @@ def main():
 Opção desejada: """
 
     title = r"""     
-    ___________________       ________  _____    __  _______  ________  _   _______    ___________   ______  __________ 
-   / ____/  _/ ____/   |     / ____/ / / /   |  /  |/  / __ \/  _/ __ \/ | / / ___/   / ____/  _/ | / / __ \/ ____/ __ \
-  / /_   / // /_  / /| |    / /   / /_/ / /| | / /|_/ / /_/ // // / / /  |/ /\__ \   / /_   / //  |/ / / / / __/ / /_/ /
- / __/ _/ // __/ / ___ |   / /___/ __  / ___ |/ /  / / ____// // /_/ / /|  /___/ /  / __/ _/ // /|  / /_/ / /___/ _, _/ 
-/_/   /___/_/   /_/  |_|   \____/_/ /_/_/  |_/_/  /_/_/   /___/\____/_/ |_//____/  /_/   /___/_/ |_/_____/_____/_/ |_|                                                                         
-                                                                                                                                        
+   _______________     _______ _____   __  ______  ________  _  ______   _________  _____  _______ 
+  / __/  _/ __/ _ |   / ___/ // / _ | /  |/  / _ \/  _/ __ \/ |/ / __/  / __/  _/ |/ / _ \/ __/ _ \
+ / _/_/ // _// __ |  / /__/ _  / __ |/ /|_/ / ___// // /_/ /    /\ \   / _/_/ //    / // / _// , _/
+/_/ /___/_/ /_/ |_|  \___/_//_/_/ |_/_/  /_/_/  /___/\____/_/|_/___/  /_/ /___/_/|_/____/___/_/|_|                                                                                                                                                                                       
     """
-    print(title)
+    console.print(title, style='bright_red')    
 
     while True:
         user_input = input(options).strip().lower()
 
-        console.clear()
+        os.system('clear')
 
         if user_input.startswith("player"):
             prefix = user_input.split(" ", 1)[1]
             # retorna lista com ids
             search_result = trie_names.search(prefix)
             if not search_result:
-                print(f'Sem resultados para a pesqusisa por {prefix}.')
+                print(f'Sem resultados para a pesqusisa por "{prefix}".')
                 continue
             # retorna lista com informações dos jogadores
             search_result = [player_hash.search(int(player_id)) for player_id in search_result]
             # sort de acordo com score medio e torna decrescente
             search_result = dec_mergesort(search_result, -1)
 
-            table = make_table(search_result, f'Resultados da busca por {prefix}', user_input)            
+            table = make_table(search_result, f'Resultados da busca por "{prefix}"', user_input)            
             
             console.print(table)
             input('Pressione enter para continuar...')
-            console.clear()
+            os.system('clear')
 
         elif user_input.startswith("user"):
             #retorna o id informado pelo usuario
@@ -137,8 +139,8 @@ Opção desejada: """
             #retorna lista com player ids e reviews pra cada um
             user_reviews = user_hash.get_reviews(int(user_id))
             if not user_reviews:
-                console.clear()
-                print(f'Sem resultados para o usuário {user_id}')
+                os.system('clear')
+                print(f'Sem resultados para o usuário "{user_id}"')
                 continue
             player_info = []
             for player_id, review in user_reviews:  #procura dados do jogador na hash a partir do id, pega a review associada ao jogador e da append no fim da lista retornada pela hash
@@ -153,11 +155,11 @@ Opção desejada: """
                 player_info = player_info[:20]
 
             ## prints table
-            table = make_table(player_info, f'Jogadores avaliados por usuário {user_id}', user_input)            
+            table = make_table(player_info, f'Jogadores avaliados por usuário "{user_id}"', user_input)            
 
             console.print(table)
             input('Pressione enter para continuar...')
-            console.clear()
+            os.system('clear')
     
         elif user_input.startswith("top"):
             top_string, position = user_input.split(" ")
@@ -165,25 +167,25 @@ Opção desejada: """
             N_players = int(top_string[3:])
 
             if not N_players:
-                console.clear()
+                os.system('clear')
                 print('Insira um numero.')
                 continue
             # retorna lista com informações dos top jogadores para posição
             players_list = player_hash.position_over_1000(position)
 
             if not players_list:
-                console.clear()
-                print(f'Sem resultados para a posição {position}.')
+                os.system('clear')
+                print(f'Sem resultados para a posição "{position}".')
                 continue
             # ordena por media global e pega os N primeiros
             players_list = dec_mergesort(players_list, -1)
             if players_list > N_players:
                 players_list = players_list[:N_players]
-            table = make_table(players_list, f'Top {N_players} jogadores para a posição {position}', user_input)
+            table = make_table(players_list, f'Top {N_players} jogadores para a posição "{position}"', user_input)
 
             console.print(table)
             input('Pressione enter para continuar...')
-            console.clear()
+            os.system('clear')
         
         elif user_input.startswith("tags"):
             player_info = []
@@ -222,11 +224,10 @@ Opção desejada: """
             
             console.print(table)
             input('Pressione enter para continuar...')
-            console.clear()
+            os.system('clear')
 
         elif user_input == "sair":
-            print("Saindo...")
-            console.clear()
+            os.system('clear')
             break
         else:
             print('Opção inválida.')
