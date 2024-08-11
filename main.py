@@ -54,23 +54,23 @@ def initialize_data_structures():
 def make_table(info_arr:list, title:str, user_input:str):
 
     table = Table(title=title)
-    table.add_column('Id SOFIFA', justify='center', style='bold bright_blue')
-    table.add_column('Nome curto', justify ='center', style = 'bold orange1')
-    table.add_column('Nome longo', justify ='center', style = 'bold green')
+    table.add_column('Id SOFIFA', style='bold bright_blue')
+    table.add_column('Nome curto', style = 'orange1')
+    table.add_column('Nome longo', style = 'green')
 
     if user_input.startswith("player") or user_input.startswith("tags") or user_input.startswith("top"):
-        table.add_column('Posições', justify ='center', style = 'bold bright_yellow')
+        table.add_column('Posições', style = 'bright_yellow')
 
     if user_input.startswith("tags") or user_input.startswith("top"):
-        table.add_column('Nacionalidade', justify ='center', style = 'bold bright_red')
-        table.add_column('Nome do clube', justify ='center', style = 'bold bright_cyan')
-        table.add_column('Nome da liga', justify ='center', style = 'bold dark_red')
+        table.add_column('Nacionalidade', style = 'bright_red')
+        table.add_column('Nome do clube', style = 'bright_cyan')
+        table.add_column('Nome da liga', style = 'dark_red')
 
-    table.add_column('Média global', justify ='center', style = 'bold hot_pink')
-    table.add_column('Nº de Avaliações', justify ='center', style = 'bold bright_red')
+    table.add_column('Média global', style = 'hot_pink')
+    table.add_column('Nº de Avaliações', style = 'bright_red')
 
     if user_input.startswith("user"):
-        table.add_column('Avaliação do usuário', justify ='center', style = 'bold bright_cyan')
+        table.add_column('Avaliação do usuário', style = 'bright_cyan')
     
     for info in info_arr:
         # id, short_name, long_name, position, rating, count
