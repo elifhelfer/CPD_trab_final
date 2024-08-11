@@ -81,6 +81,7 @@ class PlayerHash(FifaHash):
                 if element[-2] >= 1000:
                     if position.upper() in element[3]:
                         over_1000.append(element)
+        return over_1000
                 
 class UserHash(FifaHash):
     def __init__(self, hash_size):

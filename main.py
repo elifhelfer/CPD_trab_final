@@ -1,12 +1,14 @@
+from mergesort import dec_mergesort
+from rich.console import Console
+from rich.spinner import Spinner
+from rich.table import Table
 import trie
 import hash
 import time
 import csv
-from mergesort import dec_mergesort
 import re
-from rich.table import Table
-from rich.console import Console
 import os
+
 
 def initialize_data_structures():
     start_time = time.time()
@@ -25,7 +27,7 @@ def initialize_data_structures():
 
     #loop to create the user hash and name tree and insert reviews into players
     user_hash = hash.UserHash(115001)
-    with open('minirating.csv', newline='') as user_reviews:
+    with open('rating.csv', newline='') as user_reviews:
         reader = csv.reader(user_reviews)
         # skips header
         next(reader)
@@ -107,129 +109,139 @@ Opção desejada: """
  / _/_/ // _// __ |  / /__/ _  / __ |/ /|_/ / ___// // /_/ /    /\ \   / _/_/ //    / // / _// , _/
 /_/ /___/_/ /_/ |_|  \___/_//_/_/ |_/_/  /_/_/  /___/\____/_/|_/___/  /_/ /___/_/|_/____/___/_/|_|                                                                                                                                                                                       
     """
-    console.print(title, style='bright_red')    
+    console.print(title, style='bright_blue')    
 
     while True:
         user_input = input(options).strip().lower()
 
         os.system('clear')
 
-        if user_input.startswith("player"):
-            prefix = user_input.split(" ", 1)[1]
-            # retorna lista com ids
-            search_result = trie_names.search(prefix)
-            if not search_result:
-                print(f'Sem resultados para a pesqusisa por "{prefix}".')
-                continue
-            # retorna lista com informações dos jogadores
-            search_result = [player_hash.search(int(player_id)) for player_id in search_result]
-            # sort de acordo com score medio e torna decrescente
-            search_result = dec_mergesort(search_result, -1)
-
-            table = make_table(search_result, f'Resultados da busca por "{prefix}"', user_input)            
+        try:
             
-            console.print(table)
-            input('Pressione enter para continuar...')
-            os.system('clear')
+            if user_input.startswith("player"):
+                prefix = user_input.split(" ", 1)[1]
+                # retorna lista com ids
+                search_result = trie_names.search(prefix)
+                if not search_result:
+                    print(f'Sem resultados para a pesqusisa por "{prefix}".')
+                    continue
+                # retorna lista com informações dos jogadores
+                search_result = [player_hash.search(int(player_id)) for player_id in search_result]
+                # sort de acordo com score medio e torna decrescente
+                search_result = dec_mergesort(search_result, -1)
 
-        elif user_input.startswith("user"):
-            #retorna o id informado pelo usuario
-            user_id = user_input.split(" ", 1)[1]
-            #retorna lista com player ids e reviews pra cada um
-            user_reviews = user_hash.get_reviews(int(user_id))
-            if not user_reviews:
+                table = make_table(search_result, f'Resultados da busca por "{prefix}"', user_input)            
+                
+                console.print(table)
+                input('Pressione enter para continuar...')
                 os.system('clear')
-                print(f'Sem resultados para o usuário "{user_id}"')
-                continue
-            player_info = []
-            for player_id, review in user_reviews:  #procura dados do jogador na hash a partir do id, pega a review associada ao jogador e da append no fim da lista retornada pela hash
-                player_data = player_hash.search(int(player_id))
-                player_data.append(review)
-                player_info.append(player_data)
 
-            player_info = dec_mergesort(player_info, -1)    #ordena primeiro pela review do usuario e depois pela media global, de forma estavel
-            player_info = dec_mergesort(player_info, -2)
+            elif user_input.startswith("user"):
+                #retorna o id informado pelo usuario
+                user_id = user_input.split(" ", 1)[1]
+                #retorna lista com player ids e reviews pra cada um
+                user_reviews = user_hash.get_reviews(int(user_id))
+                if not user_reviews:
+                    os.system('clear')
+                    print(f'Sem resultados para o usuário "{user_id}"')
+                    continue
+                player_info = []
+                for player_id, review in user_reviews:  #procura dados do jogador na hash a partir do id, pega a review associada ao jogador e da append no fim da lista retornada pela hash
+                    player_data = player_hash.search(int(player_id))
+                    player_data.append(review)
+                    player_info.append(player_data)
 
-            if len(player_info) > 20:   #se forem mais que 20 jogadores, imprime apenas os primeiros 20
-                player_info = player_info[:20]
+                player_info = dec_mergesort(player_info, -1)    #ordena primeiro pela review do usuario e depois pela media global, de forma estavel
+                player_info = dec_mergesort(player_info, -2)
 
-            ## prints table
-            table = make_table(player_info, f'Jogadores avaliados por usuário "{user_id}"', user_input)            
+                if len(player_info) > 20:   #se forem mais que 20 jogadores, imprime apenas os primeiros 20
+                    player_info = player_info[:20]
 
-            console.print(table)
-            input('Pressione enter para continuar...')
-            os.system('clear')
-    
-        elif user_input.startswith("top"):
-            top_string, position = user_input.split(" ")
-            # slices topN to get N
-            N_players = int(top_string[3:])
+                ## prints table
+                table = make_table(player_info, f'Jogadores avaliados por usuário "{user_id}"', user_input)            
 
-            if not N_players:
+                console.print(table)
+                input('Pressione enter para continuar...')
                 os.system('clear')
-                print('Insira um numero.')
-                continue
-            # retorna lista com informações dos top jogadores para posição
-            players_list = player_hash.position_over_1000(position)
-
-            if not players_list:
-                os.system('clear')
-                print(f'Sem resultados para a posição "{position}".')
-                continue
-            # ordena por media global e pega os N primeiros
-            players_list = dec_mergesort(players_list, -1)
-            if players_list > N_players:
-                players_list = players_list[:N_players]
-            table = make_table(players_list, f'Top {N_players} jogadores para a posição "{position}"', user_input)
-
-            console.print(table)
-            input('Pressione enter para continuar...')
-            os.system('clear')
         
-        elif user_input.startswith("tags"):
-            player_info = []
-            aux_set = None
-            tags = re.findall("'(.*?)'", user_input[1:]) #isso aqui pega todas as strings entre ''. eu tinha feito de um outro jeito, mas ele nao funcionava se nao tivesse um espaco entre cada tag
-                                                         #os ' marcam o que deve estar no inicio e no fim da string, * indica que eh pra pegar
-                                                         #todos os caracteres e ? impede que ele junte todas as tags em uma string só, parando de coletar a cada fim de '
-            if not tags:
-                print('Nenhuma tag fornecida.')
-                break
+            elif user_input.startswith("top"):
+                
+                input_list = user_input.split(" ")
+                # slices topN to get N
+                if len(input_list) < 3:
+                    print('Número inválido de argumentos.')
+                    input('Pressione enter para continuar...')
+                    os.system('clear')
+                    continue
 
-            for tag in tags:
-                players_list = trie_tags.search_non_recursive(tag) #procura jogadores com a tag
+                _, N_players, position = input_list
+                N_players = int(N_players)
+                
+                # retorna lista com informações dos top jogadores para posição
+                players_list = player_hash.position_over_1000(position)
+                
                 if not players_list:
-                    print(f'Sem resultados para jogadores com a tag {tag}.')
+                    print(f'Sem resultados para a posição "{position}".')
+                    input('Pressione enter para continuar...')
+                    os.system('clear')
+                    continue
+                # ordena por media global e pega os N primeiros
+                players_list = dec_mergesort(players_list, -1)
+                if len(players_list) > N_players:
+                    players_list = players_list[:N_players]
+
+                table = make_table(players_list, f'Top {N_players} jogadores para a posição "{position}"', user_input)
+
+                console.print(table)
+                input('Pressione enter para continuar...')
+                os.system('clear')
+            
+            elif user_input.startswith("tags"):
+                player_info = []
+                aux_set = None
+                tags = re.findall("'(.*?)'", user_input[1:]) #isso aqui pega todas as strings entre ''. eu tinha feito de um outro jeito, mas ele nao funcionava se nao tivesse um espaco entre cada tag
+                                                            #os ' marcam o que deve estar no inicio e no fim da string, * indica que eh pra pegar
+                                                            #todos os caracteres e ? impede que ele junte todas as tags em uma string só, parando de coletar a cada fim de '
+                if not tags:
+                    print('Nenhuma tag fornecida.')
                     break
 
-                player_set = set()
-                for player in players_list:
-                    player_set.add(int(player)) #vai adicionando a um novo set por tag
+                for tag in tags:
+                    players_list = trie_tags.search_non_recursive(tag) #procura jogadores com a tag
+                    if not players_list:
+                        print(f'Sem resultados para jogadores com a tag {tag}.')
+                        break
 
-                if aux_set is None:
-                    aux_set = player_set #se aux_set ainda nao tem nada, inicializa ele
-                else:
-                    aux_set &= player_set #pra todas as outras iteracoes, aux_set guarda a interseccao entre os jogadores com a tag atual e a anterior
+                    player_set = set()
+                    for player in players_list:
+                        player_set.add(int(player)) #vai adicionando a um novo set por tag
 
-            if not aux_set:
-                print('Sem jogadores com essa combinação de tags.')
-                continue
+                    if aux_set is None:
+                        aux_set = player_set #se aux_set ainda nao tem nada, inicializa ele
+                    else:
+                        aux_set &= player_set #pra todas as outras iteracoes, aux_set guarda a interseccao entre os jogadores com a tag atual e a anterior
 
-            players_list = [player_hash.search(int(player)) for player in aux_set]
-            #busca cada jogador na hash
-            players_list = dec_mergesort(players_list,-1)
-            #ordena por nota global media
-            table = make_table(players_list, f'Resultados da busca pelas tags {tags}', user_input)            
-            
-            console.print(table)
-            input('Pressione enter para continuar...')
-            os.system('clear')
+                if not aux_set:
+                    print('Sem jogadores com essa combinação de tags.')
+                    continue
 
-        elif user_input == "sair":
-            os.system('clear')
-            break
-        else:
-            print('Opção inválida.')
+                players_list = [player_hash.search(int(player)) for player in aux_set]
+                #busca cada jogador na hash
+                players_list = dec_mergesort(players_list,-1)
+                #ordena por nota global media
+                table = make_table(players_list, f'Resultados da busca pelas tags {tags}', user_input)            
+                
+                console.print(table)
+                input('Pressione enter para continuar...')
+                os.system('clear')
 
+            elif user_input == "sair":
+                os.system('clear')
+                break
+            else:
+                print('Opção inválida.')
+        except:
+            print('Erro inesperado.')
+            continue
 # call main function
 main()
